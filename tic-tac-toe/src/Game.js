@@ -7,9 +7,10 @@ function Game(props) {
   const [current, SetCurrent] = useState({ squares: Array(9).fill(null) });
   const [xIsNext, SetXIsNext] = useState(true);
   const [status, setStatus] = useState("Next player: X");
+  const [stepNumber, setStepNumber] = useState(0);
 
   function handleClick(i) {
-    const historyCurrent = history[history.length - 1];
+    const historyCurrent = history.slice(0, stepNumber + 1);
     const squares = current.squares.slice();
 
     if (calculateWinner(squares) || squares[i]) {
@@ -21,13 +22,19 @@ function Game(props) {
     historyCurrent.squares = squares;
 
     SetCurrent(historyCurrent);
-    setHistory([...history]);
+    setHistory([...history, { squares }]);
     SetXIsNext(!xIsNext);
+    setStepNumber(history.length);
+  }
+
+  function jumpTo(step) {
+    setStepNumber(step);
+    SetXIsNext(step % 2 === 0);
   }
 
   useEffect(() => {
-    const historyCurrent = history[history.length - 1];
-    const squares = historyCurrent.squares.slice();
+    const historyCurrent = history.slice(0, stepNumber + 1);
+    const squares = historyCurrent[history.length - 1].squares.slice();
 
     const winner = calculateWinner(squares);
 
@@ -40,7 +47,7 @@ function Game(props) {
   }, [history]);
 
   useEffect(() => {
-    SetCurrent(history[history.length - 1]);
+    SetCurrent(history[stepNumber]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -75,7 +82,16 @@ function Game(props) {
       </div>
       <div className="game-info">
         <div>{status}</div>
-        <ol>{/* TODO */}</ol>
+        <ol>
+          {history.map((step, move) => {
+            const desc = move ? "Go to move #" + move : "Go to game start";
+            return (
+              <li key={move}>
+                <button onClick={() => jumpTo(move)}>{desc}</button>
+              </li>
+            );
+          })}
+        </ol>
       </div>
     </div>
   );
