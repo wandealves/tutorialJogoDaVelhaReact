@@ -4,15 +4,17 @@ import Square from "./Square";
 
 function Board(props) {
   const [squares, setSquares] = useState(Array(9).fill(null));
-
-  const status = "Next player: X";
+  const [xIsNext, SetXIsNext] = useState(true);
+  const [status, setStatus] = useState("Next player: X");
 
   function handleClick(i) {
     const updatedSquares = squares.slice();
 
-    updatedSquares[i] = "X";
+    setStatus(`Next player: ${xIsNext ? "X" : "O"}`);
+    updatedSquares[i] = xIsNext ? "X" : "O";
 
     setSquares(updatedSquares);
+    SetXIsNext(!xIsNext);
   }
 
   return (
